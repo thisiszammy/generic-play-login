@@ -30,6 +30,7 @@ namespace GenericLoginAspNetMvc
         {
             string connection_string = Configuration["GenericLogin:LocalConnectionString"];
 
+
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
             

@@ -67,10 +67,20 @@ namespace GenericLoginAspNetMvc.Controllers
 
             if (ModelState.IsValid)
             {
-
+                try
+                {
+                    await userRepository.AuthenticateUser(authenticateUserViewModel.Username, authenticateUserViewModel.Password, false, false);
+                    return Json("Authentication Success");
+                }catch(Exception ex)
+                {
+                    ViewBag.Error = ex.Message;
+                    return View("Login", authenticateUserViewModel);
+                }
             }
 
-            return View("");
+            ViewBag.Error = "Authentication Failed";
+            return View("Login", authenticateUserViewModel);
         }
+
     }
 }
