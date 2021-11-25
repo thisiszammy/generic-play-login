@@ -1,11 +1,13 @@
 ﻿using GenericLoginAspNetMvc.Interfaces;
 using GenericLoginAspNetMvc.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GenericLoginAspNetMvc.Controllers
@@ -41,7 +43,9 @@ namespace GenericLoginAspNetMvc.Controllers
                     await userRepository.CreateUser(userViewModel.FirstName,
                         userViewModel.LastName,
                         userViewModel.Username,
-                        userViewModel.Password);
+                        userViewModel.Password,
+                        new List<(string, string)>(),
+                        new List<string>());
 
                     TempData["RegisterSuccess"] = true;
                     return RedirectToAction("Login");
@@ -74,7 +78,7 @@ namespace GenericLoginAspNetMvc.Controllers
                 try
                 {
                     await userRepository.AuthenticateUser(authenticateUserViewModel.Username, authenticateUserViewModel.Password, false, false);
-                    return Json("Authentication Success");
+                    return RedirectToAction("Profile");
                 }catch(Exception ex)
                 {
                     ViewBag.Error = ex.Message;
@@ -86,5 +90,41 @@ namespace GenericLoginAspNetMvc.Controllers
             return View("Login", authenticateUserViewModel);
         }
 
+        [HttpGet("/logout")]
+        public async Task<IActionResult> LogOut()
+        {
+            await userRepository.SignOutUser();
+
+            return RedirectToAction("Login");
+        }
+
+        
+        [Authorize]
+        [HttpGet("/profile")]
+        public IActionResult Profile()
+        {
+            return View("Profile");
+        }
+
+        [Authorize(Policy = "CustomClaimBasedPolicy")]
+        [HttpGet("/user/dashboard")]
+        public IActionResult UserDashboard()
+        {
+            var queryCap = User.Claims.Where(x=>x.Type == "QueryCap").FirstOrDefault();
+            string _queryCap = (queryCap == null) ? "Not Found" : queryCap.Value;
+
+            var clientLMO = User.Claims.Where(x => x.Type == "Client_LastModifiedOn").FirstOrDefault().Value;
+            var serverLMO = User.Claims.Where(x => x.Type == "Server_LastModifiedOn").FirstOrDefault().Value;
+
+            _queryCap += " | S-" + serverLMO + " | C-" + clientLMO;
+
+
+            if(clientLMO != serverLMO)
+            {
+                // Force log out due to changes made in user's account pertaining to auth
+            }
+
+            return View("UserDashboard", _queryCap);
+        }
     }
 }

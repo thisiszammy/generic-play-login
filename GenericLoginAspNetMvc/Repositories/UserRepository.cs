@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GenericLoginAspNetMvc.Repositories
@@ -39,10 +40,12 @@ namespace GenericLoginAspNetMvc.Repositories
         
         }
 
-        public async Task<string> CreateUser(string firstName, string lastName, string username, string password)
+        public async Task<string> CreateUser(string firstName, string lastName, string username, string password,
+            List<(string, string)> claims, List<string> roles)
         {
             ValidationUtil.UserRepository_CreateUser(firstName, lastName, username, password);
 
+            var userClaims = new List<Claim>();
             ApplicationUser applicationUser = new ApplicationUser
             {
                 FirstName = firstName,
@@ -51,6 +54,14 @@ namespace GenericLoginAspNetMvc.Repositories
                 LockoutEnabled = true,
                 AccessFailedCount = 5
             };
+             
+            // Save User's Claims
+            //
+            //  foreach(var item in claims)
+            //        userClaims.Add(new Claim(item.Item1, item.Item2));
+
+            //  var userIdentity = new ClaimsIdentity(userClaims, "Default User Identity");
+            //
 
             var taskCreateUser = await userManager.CreateAsync(applicationUser, password);
 
@@ -70,5 +81,11 @@ namespace GenericLoginAspNetMvc.Repositories
         {
             return await userManager.FindByIdAsync(Id);
         }
+
+        public async Task SignOutUser()
+        {
+            await signInManager.SignOutAsync();
+        }
+
     }
 }

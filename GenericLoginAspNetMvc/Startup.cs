@@ -1,6 +1,9 @@
+using GenericLoginAspNetMvc.Authorization;
 using GenericLoginAspNetMvc.Interfaces;
 using GenericLoginAspNetMvc.Models;
 using GenericLoginAspNetMvc.Repositories;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,7 +15,9 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using static GenericLoginAspNetMvc.Authorization.CustomClaimRequirement;
 
 namespace GenericLoginAspNetMvc
 {
@@ -51,15 +56,36 @@ namespace GenericLoginAspNetMvc
                 .AddDefaultTokenProviders();
 
 
+
+            services.ConfigureApplicationCookie(config =>
+            {
+                config.LoginPath = "/login";
+                config.AccessDeniedPath = "/error/unauthorized";
+            });
+
             services.Configure<DataProtectionTokenProviderOptions>(options =>
             {
                 options.TokenLifespan = TimeSpan.FromDays(7);
             });
 
+
+            services.AddAuthorization(config =>
+            {
+                config.AddPolicy("CustomClaimBasedPolicy", policyBuilder =>
+                {
+                    policyBuilder.RequireCustomClaim("CustomClaim", "CustomValue");
+                });
+            });
+
+            services.AddScoped<IAuthorizationHandler, CustomClaimRequirementHandler>();
+
+            services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, CustomClaimsFactory>();
+            services.AddScoped<IClaimsTransformation, CustomClaimsTransformer>();
+
             services.AddScoped<IUserRepository, UserRepository>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -69,7 +95,6 @@ namespace GenericLoginAspNetMvc
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
@@ -77,13 +102,12 @@ namespace GenericLoginAspNetMvc
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapDefaultControllerRoute();
             });
         }
     }

@@ -8,8 +8,9 @@ namespace GenericLoginAspNetMvc.Interfaces
 {
     public interface IUserRepository
     {
-        public Task<string> CreateUser(string firstName, string lastName, string username, string password);
+        public Task<string> CreateUser(string firstName, string lastName, string username, string password, List<(string, string)> claims, List<string> roles);
         public Task<ApplicationUser> GetUserById(string Id);
         public Task AuthenticateUser(string username, string password, bool isPersistent, bool lockoutOnFailure);
+        public Task SignOutUser();
     }
 }
