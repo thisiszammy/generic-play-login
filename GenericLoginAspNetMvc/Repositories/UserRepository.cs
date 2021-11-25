@@ -1,5 +1,6 @@
 ﻿using GenericLoginAspNetMvc.Interfaces;
 using GenericLoginAspNetMvc.Models;
+using GenericLoginAspNetMvc.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System;
@@ -29,6 +30,8 @@ namespace GenericLoginAspNetMvc.Repositories
 
         public async Task AuthenticateUser(string username, string password, bool isPersistent, bool lockoutOnFailure)
         {
+            ValidationUtil.UserRepository_AuthenticateUser(username, password);
+
             var taskAuthenticate = await signInManager.PasswordSignInAsync(username, password,isPersistent, lockoutOnFailure);
 
             if (!taskAuthenticate.Succeeded)
@@ -38,6 +41,8 @@ namespace GenericLoginAspNetMvc.Repositories
 
         public async Task<string> CreateUser(string firstName, string lastName, string username, string password)
         {
+            ValidationUtil.UserRepository_CreateUser(firstName, lastName, username, password);
+
             ApplicationUser applicationUser = new ApplicationUser
             {
                 FirstName = firstName,
