@@ -1,4 +1,4 @@
-﻿@model GenericLoginAspNetMvc.ViewModels.CreateUserViewModel
+﻿@model GenericLoginAspNetMvc.ViewModels.AuthenticateUserViewModel
 @{
     Layout = null;
 }
@@ -8,20 +8,11 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>CreateAccount</title>
+    <title>Login</title>
 </head>
 <body>
 
-
-    <form method="post" asp-action="CreateAccount" asp-controller="Home">
-
-
-        <label for="txtFirstName">First Name</label>
-        <input type="text" placeholder="First Name" id="txtFirstName" asp-for="FirstName" />
-
-
-        <label for="txtFirstName">Last Name</label>
-        <input type="text" placeholder="First Name" id="txtFirstName" asp-for="LastName" />
+    <form asp-action="Login" asp-controller="Home" method="post">
 
         <label for="txtUsername">Username</label>
         <input type="text" placeholder="Username" id="txtUsername" asp-for="Username" />
@@ -34,12 +25,18 @@
     </form>
 
 
-
-
     @if (ViewBag.Error != null)
     {
         <script>
             alert('@ViewBag.Error');
+        </script>
+    }
+
+
+    @if (ViewBag.RegisterSuccess != null)
+    {
+        <script>
+            alert('Registration Successful!');
         </script>
     }
 

@@ -15,9 +15,11 @@ namespace GenericLoginAspNetMvc.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IUserRepository userRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger,
+            IUserRepository userRepository)
         {
             _logger = logger;
+            this.userRepository = userRepository;
         }
 
         [HttpGet("/register")]
@@ -41,6 +43,7 @@ namespace GenericLoginAspNetMvc.Controllers
                         userViewModel.Username,
                         userViewModel.Password);
 
+                    TempData["RegisterSuccess"] = true;
                     return RedirectToAction("Login");
 
                 }catch(Exception ex)
@@ -57,6 +60,7 @@ namespace GenericLoginAspNetMvc.Controllers
         [HttpGet("/login")]
         public IActionResult Login()
         {
+            ViewBag.RegisterSuccess = TempData["RegisterSuccess"];
             return View("Login");
         }
 
