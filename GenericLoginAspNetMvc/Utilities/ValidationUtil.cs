@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GenericLoginAspNetMvc.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,10 +11,16 @@ namespace GenericLoginAspNetMvc.Utilities
     public static class ValidationUtil
     {
 
-        public static void UserRepository_CreateUser(string firstName, string lastName, string username, string password)
+        public static void UserRepository_CreateUser(string firstName, string lastName, string username, string password, string accountType)
         {
             string err_message = string.Empty;
             bool hasFailedValidation = false;
+
+            if(!Enum.TryParse<AccountTypeEnum>(accountType, out AccountTypeEnum _blank))
+            {
+                hasFailedValidation = true;
+                err_message += "Please Select Valid Account Type";
+            }
 
             // I could probably do this with regex but i'll leave that for later
 

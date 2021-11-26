@@ -14,6 +14,8 @@ namespace GenericLoginAspNetMvc.Models
         public DateTime? LastModifiedOn { get; set; }
         public DateTime? EmailConfirmedTimestamp { get; set; }
         public DateTime? PhoneNumberConfirmedTimestamp { get; set; }
+        public DateTime? AuthorityChangedTimestamp { get; set; }
+        public AccountTypeEnum AccountType { get; set; }
         public string CreatedBy { get; set; }
         public string LastModifiedBy { get; set; }
     }

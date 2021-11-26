@@ -44,6 +44,7 @@ namespace GenericLoginAspNetMvc.Controllers
                         userViewModel.LastName,
                         userViewModel.Username,
                         userViewModel.Password,
+                        userViewModel.AccountType,
                         new List<(string, string)>(),
                         new List<string>());
 
@@ -99,7 +100,7 @@ namespace GenericLoginAspNetMvc.Controllers
         }
 
         
-        [Authorize]
+        [Authorize(Policy = "RegularUserPolicy")]
         [HttpGet("/profile")]
         public IActionResult Profile()
         {

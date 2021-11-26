@@ -12,6 +12,7 @@
 </head>
 <body>
 
+    <h1>Public Registration</h1>
 
     <form method="post" asp-action="CreateAccount" asp-controller="Home">
 
@@ -28,6 +29,12 @@
 
         <label for="txtPassword">Password</label>
         <input type="password" placeholder="Password" id="txtPassword" asp-for="Password" />
+
+        <label for="txtAccountType">Account Type</label>
+        <select id="txtAccountType" asp-for="AccountType">
+            <option value="" selected>Please Select Account Type...</option>
+            <option value="RegularUser">Regular User</option>
+        </select>
 
         <button id="btnLogin" type="submit">Login</button>
 

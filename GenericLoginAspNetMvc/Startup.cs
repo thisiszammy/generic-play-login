@@ -75,6 +75,17 @@ namespace GenericLoginAspNetMvc
                 {
                     policyBuilder.RequireCustomClaim("CustomClaim", "CustomValue");
                 });
+
+                config.AddPolicy("RegularUserPolicy", policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.IsInRole("RegularUser")));
+
+                config.AddPolicy("SystemAdminPolicy", policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.IsInRole("SystemAdmin")));
+
+
+
             });
 
             services.AddScoped<IAuthorizationHandler, CustomClaimRequirementHandler>();
